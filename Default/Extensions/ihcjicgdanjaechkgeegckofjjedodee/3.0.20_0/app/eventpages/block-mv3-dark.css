@@ -1,0 +1,14 @@
+
+@import url("common-styles-dark.css");
+
+#website-blocked>#alert {
+    background-color: transparent;
+}
+
+.medium-alert {
+    background-color:#282A32 !important;
+}
+
+.back-arrow {
+    filter: invert(100%);
+}

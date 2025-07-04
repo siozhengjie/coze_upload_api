@@ -1,0 +1,1 @@
+async function handleMessages(e,s,n){return"offscreen"===e.target&&("is-dark-mode"!==e.type||(sendToBackground("is-dark-mode-response",window.matchMedia("(prefers-color-scheme: dark)").matches),!0))}function sendToBackground(e,s){chrome.runtime.sendMessage({type:e,target:"background",data:s,offscreen:!0})}chrome.runtime.onMessage.addListener(handleMessages);

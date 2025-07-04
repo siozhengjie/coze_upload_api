@@ -1,0 +1,31 @@
+.mb-block-notification-box {
+    background: #1C1B1F !important;
+  }
+
+  .mb-text {
+    color: white !important;
+  }
+
+  .mb-box-header-content {
+    background: #282A32 !important;
+  }
+
+  .mb-top {
+    background: #282A32 !important;
+  }
+
+  .mb-top-banner {
+   fill: #282A32 !important;
+  }
+
+  .mb-top-banner-text {
+   fill: #fff !important;
+  }
+
+.mb-button {
+  background: #9EB2EB !important;
+  color: #282A32 !important;
+}
+#mb-close svg {
+  fill: white;
+}

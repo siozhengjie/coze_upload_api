@@ -1,0 +1,15 @@
+
+@import url("common-styles-dark.css");
+
+input:checked + .slider {
+    background-color: #7A95E3;
+}
+
+.permission-content-header {
+    border: 1px solid #2d2d2d;
+    background-color: #282A32;
+}
+
+.permission-content-instruction {
+    background-color: #282A32;
+}

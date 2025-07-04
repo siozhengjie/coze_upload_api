@@ -1,0 +1,123 @@
+{
+  "manifest_version": 2,
+  "author": "Malwarebytes",
+  "name": "Malwarebytes Browser Guard",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
+  "version": "2.6.27",
+  "icons": {
+    "16": "app/assets/bg-icon/bg-favicon-16x16.png",
+    "32": "app/assets/bg-icon/bg-favicon-32x32.png",
+    "48": "app/assets/bg-icon/bg-favicon-48x48.png",
+    "64": "app/assets/bg-icon/bg-favicon-64x64.png",
+    "96": "app/assets/bg-icon/bg-favicon-96x96.png",
+    "200": "app/assets/bg-icon/bg-favicon-200x200.png",
+    "256": "app/assets/bg-icon/bg-favicon-256x256.png",
+    "512": "app/assets/bg-icon/bg-favicon-512x512.png"
+  },
+  "web_accessible_resources": [
+    "*.eot",
+    "*.ttf",
+    "*.woff",
+    "*.woff2",
+    "app/assets/close-icon.svg",
+    "app/assets/tooltip.svg",
+    "app/eventpages/block.html",
+    "app/eventpages/debugger.html",
+    "app/eventpages/downloading.html",
+    "app/eventpages/block-notification.html",
+    "app/eventpages/breach-notification.html",
+    "app/eventpages/block-notification.css",
+    "app/eventpages/block-notification-dark.css",
+    "app/eventpages/breach-notification.css",
+    "app/eventpages/breach-notification-dark.css",
+    "app/eventpages/clipboard-notification.html",
+    "app/eventpages/clipboard-notification.css",
+    "app/eventpages/clipboard-notification-dark.css",
+    "app/eventpages/monthly-notification.html",
+    "app/eventpages/monthly-notification.css",
+    "app/eventpages/monthly-notification-dark.css",
+    "app/eventpages/search-hijacking-notification.html",
+    "app/eventpages/search-hijacking-notification.css",
+    "app/eventpages/search-hijacking-notification-dark.css",
+    "app/assets/check-icon.svg",
+    "app/assets/check-icon-dark.svg",
+    "app/eventpages/release-notification.html",
+    "app/eventpages/release-notification.css",
+    "app/eventpages/release-notification-dark.css",
+    "injection-instart.js",
+    "injection-tss.js",
+    "injection-tss-notification.js",
+    "injection-topics.js",
+    "injection-tss-skimmer.js",
+    "vendor/*",
+    "app/content-style.css",
+    "app/app.html"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.malwarebytes.com/browserguard/*"
+      ],
+      "js": [
+        "content-debugging.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-scripts.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "browser_action": {
+    "default_icon": {
+      "16": "app/assets/bg-icon/bg-favicon-16x16.png",
+      "32": "app/assets/bg-icon/bg-favicon-32x32.png",
+      "48": "app/assets/bg-icon/bg-favicon-48x48.png",
+      "64": "app/assets/bg-icon/bg-favicon-64x64.png",
+      "96": "app/assets/bg-icon/bg-favicon-96x96.png",
+      "200": "app/assets/bg-icon/bg-favicon-200x200.png",
+      "256": "app/assets/bg-icon/bg-favicon-256x256.png",
+      "512": "app/assets/bg-icon/bg-favicon-512x512.png"
+    },
+    "default_popup": "app/pop.html",
+    "default_title": "Malwarebytes"
+  },
+  "permissions": [
+    "alarms",
+    "downloads",
+    "storage",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "unlimitedStorage",
+    "nativeMessaging",
+    "<all_urls>",
+    "contextMenus"
+  ],
+  "optional_permissions": [
+        "clipboardRead",
+        "clipboardWrite"
+    ],
+  "incognito": "spanning",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{242af0bb-db11-4734-b7a0-61cb8a9b20fb}",
+      "strict_min_version": "128.0"
+    }
+  }
+}

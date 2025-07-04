@@ -1,0 +1,104 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "app/assets/bg-icon/bg-favicon-16x16.png",
+         "200": "app/assets/bg-icon/bg-favicon-200x200.png",
+         "256": "app/assets/bg-icon/bg-favicon-256x256.png",
+         "32": "app/assets/bg-icon/bg-favicon-32x32.png",
+         "48": "app/assets/bg-icon/bg-favicon-48x48.png",
+         "512": "app/assets/bg-icon/bg-favicon-512x512.png",
+         "64": "app/assets/bg-icon/bg-favicon-64x64.png",
+         "96": "app/assets/bg-icon/bg-favicon-96x96.png"
+      },
+      "default_popup": "app/pop.html",
+      "default_title": "Malwarebytes"
+   },
+   "author": "Malwarebytes",
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "js": [ "content-debugging.js" ],
+      "matches": [ "https://www.malwarebytes.com/browserguard/*", "https://browserguard.local/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "content-scripts.js" ],
+      "match_about_blank": true,
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "injection-tss-mv3.js" ],
+      "match_about_blank": true,
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start",
+      "world": "MAIN"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+   },
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "enabled": true,
+         "id": "mbgc.mv3.whitelist_1",
+         "path": "db/mbgc.mv3.whitelist_1.json"
+      }, {
+         "enabled": false,
+         "id": "mbgc.mv3.ads_1",
+         "path": "db/mbgc.mv3.ads_1.json"
+      }, {
+         "enabled": false,
+         "id": "mbgc.mv3.ads_2",
+         "path": "db/mbgc.mv3.ads_2.json"
+      }, {
+         "enabled": false,
+         "id": "mbgc.mv3.malware_1",
+         "path": "db/mbgc.mv3.malware_1.json"
+      }, {
+         "enabled": false,
+         "id": "mbgc.mv3.easylist_1",
+         "path": "db/mbgc.mv3.easylist_1.json"
+      }, {
+         "enabled": false,
+         "id": "mbgc.mv3.easyprivacy_1",
+         "path": "db/mbgc.mv3.easyprivacy_1.json"
+      }, {
+         "enabled": true,
+         "id": "mbgc.arw",
+         "path": "db/mbgc.arw.json"
+      } ]
+   },
+   "default_locale": "en",
+   "description": "__MSG_appDesc__",
+   "externally_connectable": {
+      "matches": [ "*://*.msn.com/*" ]
+   },
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "16": "app/assets/bg-icon/bg-favicon-16x16.png",
+      "200": "app/assets/bg-icon/bg-favicon-200x200.png",
+      "256": "app/assets/bg-icon/bg-favicon-256x256.png",
+      "32": "app/assets/bg-icon/bg-favicon-32x32.png",
+      "48": "app/assets/bg-icon/bg-favicon-48x48.png",
+      "512": "app/assets/bg-icon/bg-favicon-512x512.png",
+      "64": "app/assets/bg-icon/bg-favicon-64x64.png",
+      "96": "app/assets/bg-icon/bg-favicon-96x96.png"
+   },
+   "incognito": "split",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjXDCiC04k7bBsxt8m01loWKV8h20m8H6Wnm9DNt4CpmRKFeRTTiv6vFWkjQSKUaBvbO2mTy/2kAj5pWgufQZjyfBBCxuh51c7UOnXSyPSZ2KS3mIGd47Y4+Wi2xf0NxmWdtSrGy2NFIZx34GhWsHnrMH80M7ZDi+Oi0NvZMCi/Go+e96zAF4IBFM/Geraf0uJOgbdrD47NBtRU5MSDxdL2TG3y2KFamm5Pl0W3+srIf+0X2vdgaYAkXzIzYzRCP8JDhI5hooTvv8XnUL2/oAX0S6kiMhRMXoeIPRtGGH4HH7W3nJ4YxGHFMUYy/uIe2CqKS8EXJ0XE7A4xSkggPTkQIDAQAB",
+   "manifest_version": 3,
+   "name": "Malwarebytes Browser Guard",
+   "optional_permissions": [ "clipboardRead", "clipboardWrite" ],
+   "permissions": [ "alarms", "downloads", "storage", "tabs", "declarativeNetRequest", "declarativeNetRequestFeedback", "unlimitedStorage", "webRequest", "contextMenus", "nativeMessaging", "offscreen", "activeTab" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "3.0.20",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "*.eot", "*.ttf", "*.woff", "*.woff2" ]
+   }, {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "app/assets/close-icon.svg", "app/assets/tooltip.svg", "app/eventpages/block.html", "app/eventpages/block-content-control.html", "app/eventpages/block-mv3.html", "app/eventpages/debugger.html", "app/eventpages/downloading.html", "app/eventpages/block-notification.html", "app/eventpages/breach-notification.html", "app/eventpages/block-notification.css", "app/eventpages/block-notification-dark.css", "app/eventpages/breach-notification.css", "app/eventpages/breach-notification-dark.css", "app/eventpages/monthly-notification.html", "app/eventpages/monthly-notification.css", "app/eventpages/monthly-notification-dark.css", "app/assets/check-icon.svg", "app/assets/check-icon-dark.svg", "app/eventpages/release-notification.html", "app/eventpages/release-notification.css", "app/eventpages/release-notification-dark.css", "app/eventpages/clipboard-notification.html", "app/eventpages/clipboard-notification.css", "app/eventpages/clipboard-notification-dark.css", "app/eventpages/search-hijacking-notification.html", "app/eventpages/search-hijacking-notification.css", "app/eventpages/search-hijacking-notification-dark.css", "app/eventpages/empty.html", "injection-instart.js", "injection-tss-mv3.js", "injection-tss-notification.js", "injection-topics.js", "injection-tss-skimmer.js", "offscreen/offscreen.html", "vendor/*", "app/content-style.css", "app/app.html" ],
+      "use_dynamic_url": false
+   } ]
+}

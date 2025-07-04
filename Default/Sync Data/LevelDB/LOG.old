@@ -1,0 +1,6 @@
+2025/06/27-10:36:51.594 4634 Reusing MANIFEST C:\cozedocuments\Default\Sync Data\LevelDB/MANIFEST-000001
+2025/06/27-10:36:51.595 4634 Recovering log #4
+2025/06/27-10:36:51.598 4634 Reusing old log C:\cozedocuments\Default\Sync Data\LevelDB/000004.log 
+2025/06/27-10:36:52.769 4fb8 Level-0 table #8: started
+2025/06/27-10:36:52.777 4fb8 Level-0 table #8: 86187 bytes OK
+2025/06/27-10:36:52.781 4fb8 Delete type=0 #4

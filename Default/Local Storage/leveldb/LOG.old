@@ -1,0 +1,6 @@
+2025/06/27-10:36:51.642 2c88 Reusing MANIFEST C:\cozedocuments\Default\Local Storage\leveldb/MANIFEST-000001
+2025/06/27-10:36:51.646 2c88 Recovering log #4
+2025/06/27-10:36:51.648 2c88 Reusing old log C:\cozedocuments\Default\Local Storage\leveldb/000004.log 
+2025/06/27-10:53:33.700 43b0 Level-0 table #8: started
+2025/06/27-10:53:33.704 43b0 Level-0 table #8: 16109 bytes OK
+2025/06/27-10:53:33.709 43b0 Delete type=0 #4

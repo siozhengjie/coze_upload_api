@@ -1,0 +1,33 @@
+@import url("common-styles.css");
+
+.permission-content-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.permission-gear-icon {
+    margin-top: 1rem;
+}
+
+.permission-header {
+    margin-top: 2rem;
+}
+
+.permission-desc {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+    text-align: center;
+}
+
+#permission-btn {
+    margin-top: 1rem;
+    padding: 0 4rem;
+}
+
+#primary-button-text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+}
