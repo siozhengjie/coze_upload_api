@@ -16,7 +16,7 @@ def trigger_upload():
     return jsonify({"status": result})
 
 async def upload_to_coze_via_cdp(filename):
-    base_folder = r"C:\cozedocuments"
+    base_folder = r"C:\cozedocuments"  # <-- REMEMBER: This folder must exist on the server or adjust accordingly
     file_path = os.path.join(base_folder, filename)
 
     if not os.path.isfile(file_path):
@@ -67,7 +67,7 @@ async def upload_to_coze_via_cdp(filename):
             await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             await page.wait_for_timeout(1000)
 
-            # ⏳ Wait for second "Next" button to be enabled
+            # Wait for second Next button
             for _ in range(50):
                 try:
                     next_button = await page.query_selector("text=Next")
@@ -98,7 +98,6 @@ async def upload_to_coze_via_cdp(filename):
             await page.wait_for_timeout(1000)
             await page.click("text=Next")
 
-
             print("⚙️ Waiting for 'Processed completed' message...")
             for _ in range(60):
                 try:
@@ -127,7 +126,5 @@ async def upload_to_coze_via_cdp(filename):
             return f"❌ Error during automation: {str(e)}"
 
 if __name__ == "__main__":
-    app.run(host='0,0,0,0' port=5001)
-
-
-
+    # Listen on all IPs, port from env variable (needed for Render.com)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
