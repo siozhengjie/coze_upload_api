@@ -1,6 +1,7 @@
 import os
 import asyncio
 from flask import Flask, request, jsonify
+from pathlib import Path
 from playwright.async_api import async_playwright
 
 app = Flask(__name__)
@@ -16,8 +17,9 @@ def trigger_upload():
     return jsonify({"status": result})
 
 async def upload_to_coze_via_cdp(filename):
-    base_folder = r"C:\cozedocuments"  # <-- REMEMBER: This folder must exist on the server or adjust accordingly
-    file_path = os.path.join(base_folder, filename)
+    base_folder = r"C:\cozedocuments"
+    safe_filename = Path(filename).name
+    file_path = os.path.join(base_folder, safe_filename)
 
     if not os.path.isfile(file_path):
         return f"❌ File not found: {file_path}"
@@ -41,7 +43,7 @@ async def upload_to_coze_via_cdp(filename):
 
             print("✏️ Typing knowledge title...")
             await page.wait_for_selector("input[placeholder='Enter the knowledge name']")
-            await page.fill("input[placeholder='Enter the knowledge name']", filename)
+            await page.fill("input[placeholder='Enter the knowledge name']", safe_filename)
 
             print("📁 Uploading file...")
             await page.set_input_files("input[type='file']", file_path)
@@ -67,7 +69,6 @@ async def upload_to_coze_via_cdp(filename):
             await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             await page.wait_for_timeout(1000)
 
-            # Wait for second Next button
             for _ in range(50):
                 try:
                     next_button = await page.query_selector("text=Next")
@@ -84,10 +85,7 @@ async def upload_to_coze_via_cdp(filename):
             for _ in range(60):
                 try:
                     preview_texts = await page.query_selector_all("div[class*='coz-'] >> text=*")
-                    has_preview = any(
-                        (await t.inner_text()).strip() != "Segmented preview"
-                        for t in preview_texts
-                    )
+                    has_preview = any((await t.inner_text()).strip() != "Segmented preview" for t in preview_texts)
                     if has_preview:
                         break
                 except:
@@ -120,11 +118,10 @@ async def upload_to_coze_via_cdp(filename):
             await page.click('button[data-testid="knowledge.create.unit.confirm.btn"]')
             await page.click("text=Confirm")
 
-            return f"✅ Successfully imported and confirmed: {filename}"
+            return f"✅ Successfully imported and confirmed: {safe_filename}"
 
         except Exception as e:
             return f"❌ Error during automation: {str(e)}"
 
 if __name__ == "__main__":
-    # Listen on all IPs, port from env variable (needed for Render.com)
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
