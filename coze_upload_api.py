@@ -11,15 +11,19 @@ def trigger_upload():
     data = request.get_json()
     filename = data.get("filename")
     if not filename:
-        return jsonify({"error": "Missing 'filename' in request body"}), 400
+        return jsonify({"status": "❌ Missing 'filename' in request body"}), 400
 
     result = asyncio.run(upload_to_coze_via_cdp(filename))
     return jsonify({"status": result})
+
 
 async def upload_to_coze_via_cdp(filename):
     base_folder = r"C:\cozedocuments"
     safe_filename = Path(filename).name
     file_path = os.path.join(base_folder, safe_filename)
+
+    print("🧪 Looking for file:", file_path)
+    print("📂 Folder contains:", os.listdir(base_folder))
 
     if not os.path.isfile(file_path):
         return f"❌ File not found: {file_path}"
@@ -96,7 +100,7 @@ async def upload_to_coze_via_cdp(filename):
             await page.wait_for_timeout(1000)
             await page.click("text=Next")
 
-            print("⚙️ Waiting for 'Processed completed' message...")
+            print("⚙️ Waiting for 'Processed completed' message..." )
             for _ in range(60):
                 try:
                     processed_divs = await page.query_selector_all('div[data-testid^="knowledge.create.unit.progress.success.icon"]')
@@ -118,10 +122,23 @@ async def upload_to_coze_via_cdp(filename):
             await page.click('button[data-testid="knowledge.create.unit.confirm.btn"]')
             await page.click("text=Confirm")
 
-            return f"✅ Successfully imported and confirmed: {safe_filename}"
+            print("🔍 Verifying the file is listed in Knowledge tab...")
+            for _ in range(30):  # wait up to 30 seconds
+                await page.wait_for_timeout(1000)
+                try:
+                    titles = await page.query_selector_all("div[data-testid='bot.knowledge.unit.title']")
+                    for title in titles:
+                        text = await title.inner_text()
+                        if safe_filename.lower() in text.lower():
+                            return f"✅ Successfully imported and confirmed: {safe_filename}"
+                except:
+                    pass
+
+            return f"❌ Upload finished but file not found in Knowledge list: {safe_filename}"
 
         except Exception as e:
             return f"❌ Error during automation: {str(e)}"
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
