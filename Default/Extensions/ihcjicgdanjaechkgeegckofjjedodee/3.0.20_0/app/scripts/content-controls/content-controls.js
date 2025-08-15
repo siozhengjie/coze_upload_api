@@ -1,1 +1,0 @@
-import{Mv2ContentControls}from"./content-control-mv2";import{Mv3ContentControls}from"./content-control-mv3";import{isMV3}from"../../../utils/utils";export const contentControls=isMV3()?new Mv3ContentControls:new Mv2ContentControls;

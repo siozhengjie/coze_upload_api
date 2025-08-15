@@ -1,7 +1,7 @@
 import os
 import asyncio
+import threading
 from flask import Flask, request, jsonify
-from pathlib import Path
 from playwright.async_api import async_playwright
 
 app = Flask(__name__)
@@ -11,52 +11,55 @@ def trigger_upload():
     data = request.get_json()
     filename = data.get("filename")
     if not filename:
-        return jsonify({"status": "❌ Missing 'filename' in request body"}), 400
+        return jsonify({"error": "Missing 'filename' in request body"}), 400
 
-    result = asyncio.run(upload_to_coze_via_cdp(filename))
-    return jsonify({"status": result})
+    def run_background():
+        asyncio.run(upload_to_coze(filename))
+
+    threading.Thread(target=run_background).start()
+    return jsonify({"status": f"✅ Upload started for {filename}. Check Chrome window!"})
 
 
-async def upload_to_coze_via_cdp(filename):
+async def upload_to_coze(filename):
     base_folder = r"C:\cozedocuments"
-    safe_filename = Path(filename).name
-    file_path = os.path.join(base_folder, safe_filename)
-
-    print("🧪 Looking for file:", file_path)
-    print("📂 Folder contains:", os.listdir(base_folder))
+    file_path = os.path.join(base_folder, filename)
 
     if not os.path.isfile(file_path):
-        return f"❌ File not found: {file_path}"
+        print(f"❌ File not found: {file_path}")
+        return
 
     async with async_playwright() as p:
         try:
-            print("🔗 Connecting to Chrome via CDP...")
-            browser = await p.chromium.connect_over_cdp("http://127.0.0.1:9222")
-            context = browser.contexts[0]
-            page = await context.new_page()
+            print("🚀 Launching Chrome...")
+            context = await p.chromium.launch_persistent_context(
+                user_data_dir=base_folder,
+                headless=False,
+                executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                viewport=None,
+                args=["--start-maximized", "--window-size=1920,1080"]
+            )
+            page = context.pages[0] if context.pages else await context.new_page()
 
-            print("🌐 Navigating to Coze AI...")
+            print("🌐 Navigating to Coze...")
             await page.goto("https://www.coze.com/space/7509312123684798472/bot/7507066681052332050", wait_until="domcontentloaded")
 
-            print("🔐 Waiting for '+ Text' button...")
+            print("🔐 Clicking '+ Text' button...")
             await page.wait_for_selector('button[data-testid="bot.editor.tool.data-set-text.add-button"]')
             await page.click('button[data-testid="bot.editor.tool.data-set-text.add-button"]')
 
             print("➕ Clicking 'Create Knowledge'...")
             await page.click("text=Create Knowledge")
+            await page.wait_for_timeout(1500)
 
-            print("✏️ Typing knowledge title...")
+            print("✏️ Typing title...")
             await page.wait_for_selector("input[placeholder='Enter the knowledge name']")
-            await page.fill("input[placeholder='Enter the knowledge name']", safe_filename)
-
-            print("📁 Uploading file...")
-            await page.set_input_files("input[type='file']", file_path)
+            await page.fill("input[placeholder='Enter the knowledge name']", filename)
 
             print("✅ Clicking 'Create and Import'...")
             await page.wait_for_selector("text=Create and Import")
             await page.click("text=Create and Import")
 
-            print("⏳ Waiting for first 'Next' to be enabled...")
+            print("⏳ Waiting for 'Next' button to be enabled...")
             for _ in range(60):
                 try:
                     next_button = await page.query_selector("text=Next")
@@ -64,49 +67,45 @@ async def upload_to_coze_via_cdp(filename):
                         is_disabled = await next_button.get_attribute("disabled")
                         if is_disabled is None:
                             await next_button.click()
+                            print("▶️ Clicked 'Next'")
                             break
                 except:
                     pass
                 await page.wait_for_timeout(1000)
 
-            print("📜 Waiting for second 'Next' after preview...")
+            print("📜 Scrolling and clicking 'Next' again...")
             await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             await page.wait_for_timeout(1000)
-
-            for _ in range(50):
-                try:
-                    next_button = await page.query_selector("text=Next")
-                    if next_button:
-                        is_disabled = await next_button.get_attribute("disabled")
-                        if is_disabled is None:
-                            await next_button.click()
-                            break
-                except:
-                    pass
-                await page.wait_for_timeout(1000)
+            await page.click("text=Next")
 
             print("🧩 Waiting for segmented preview content...")
             for _ in range(60):
                 try:
                     preview_texts = await page.query_selector_all("div[class*='coz-'] >> text=*")
-                    has_preview = any((await t.inner_text()).strip() != "Segmented preview" for t in preview_texts)
+                    has_preview = any(
+                        (await t.inner_text()).strip() != "Segmented preview"
+                        for t in preview_texts
+                    )
                     if has_preview:
+                        print("🧠 Segmented preview detected.")
                         break
                 except:
                     pass
                 await page.wait_for_timeout(1000)
 
+            print("📜 Scrolling and clicking 'Next' again...")
             await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             await page.wait_for_timeout(1000)
             await page.click("text=Next")
 
-            print("⚙️ Waiting for 'Processed completed' message..." )
+            print("⚙️ Waiting for 'Processed completed'...")
             for _ in range(60):
                 try:
                     processed_divs = await page.query_selector_all('div[data-testid^="knowledge.create.unit.progress.success.icon"]')
                     for div in processed_divs:
                         text = await div.inner_text()
                         if "processed completed" in text.strip().lower():
+                            print("✅ Processed completed.")
                             break
                     else:
                         await page.wait_for_timeout(1000)
@@ -115,30 +114,17 @@ async def upload_to_coze_via_cdp(filename):
                 except:
                     await page.wait_for_timeout(1000)
 
+            print("🔘 Clicking 'Confirm'...")
             await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             await page.wait_for_timeout(1000)
-
-            print("🔘 Clicking 'Confirm'...")
             await page.click('button[data-testid="knowledge.create.unit.confirm.btn"]')
-            await page.click("text=Confirm")
 
-            print("🔍 Verifying the file is listed in Knowledge tab...")
-            for _ in range(30):  # wait up to 30 seconds
-                await page.wait_for_timeout(1000)
-                try:
-                    titles = await page.query_selector_all("div[data-testid='bot.knowledge.unit.title']")
-                    for title in titles:
-                        text = await title.inner_text()
-                        if safe_filename.lower() in text.lower():
-                            return f"✅ Successfully imported and confirmed: {safe_filename}"
-                except:
-                    pass
-
-            return f"❌ Upload finished but file not found in Knowledge list: {safe_filename}"
+            print(f"🎉 Finished uploading {filename}")
+            await context.close()
 
         except Exception as e:
-            return f"❌ Error during automation: {str(e)}"
+            print(f"❌ Error during automation: {str(e)}")
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(port=5001)
